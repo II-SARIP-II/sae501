@@ -1,35 +1,27 @@
-import { isMobile } from 'react-device-detect';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../styles/App.css';
 import '../styles/index.css';
 
-function useMobileOverride() {
-    const [isMobileOverride, setIsMobileOverride] = useState(false);
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        setIsMobileOverride(params.get('mobile') === 'true');
-    }, []);
-
-    return isMobileOverride;
-}
-
 export default function Index() {
-    const isMobileOverride = useMobileOverride();
-    const [isClientSide, setIsClientSide] = useState(false);
+    const [isMobileDevice, setIsMobileDevice] = useState(false);
 
     useEffect(() => {
-        setIsClientSide(true);
+        const checkDevice = () => {
+            setIsMobileDevice(window.innerWidth <= 768);
+        };
+
+        checkDevice();
+        window.addEventListener('resize', checkDevice);
+
+        return () => {
+            window.removeEventListener('resize', checkDevice);
+        };
     }, []);
 
-    if (!isClientSide) {
-        return null;
-    }
-
-    if (!isMobile && !isMobileOverride) {
-        return <div>Ce site est accessible uniquement sur mobile.</div>;
+    if (!isMobileDevice) {
+        return <div className="non-mobile-message">Ce site est accessible uniquement sur mobile.</div>;
     }
 
     return (
@@ -51,7 +43,6 @@ export default function Index() {
                     <nav>
                         <Link href="/home">Accueil</Link> |{' '}
                         <Link href="/joinGame">Rejoindre le Jeu</Link> |{' '}
-                        <Link href="/notFound">Page Introuvable</Link>
                     </nav>
                 </div>
             </div>

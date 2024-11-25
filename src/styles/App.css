@@ -107,6 +107,15 @@ body{
   font-family: var(--font-family-amatic);
 }
 
+.non-mobile-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--white);
+  font-family: var(--font-family-amatic);
+  background-color: var(--black);
+}
 
 @keyframes animate {
   0%{
