@@ -1,8 +1,7 @@
 import '../styles/App.css'; // Importer les styles globaux (y compris Tailwind)
 import Head from 'next/head';
 import React from "react";
-import Navbar from "/Navbar";
-
+import Header from "../components/_header";
 function MyApp({ Component, pageProps }) {
     return (
         <>
@@ -10,7 +9,7 @@ function MyApp({ Component, pageProps }) {
                 <title>PARMI NOUS</title>
                 {/*<link rel="icon" href="/flavicon.ico"/>*/}
             </Head>
-            <Navbar />
+            <Header />
             {/* Le composant de la page courante */}
             <Component {...pageProps} />
         </>

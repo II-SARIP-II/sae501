@@ -1,4 +1,4 @@
-export default function NotFound() {
+export default function notFound() {
     return (
         <div>
             <h1>PIPI</h1>
