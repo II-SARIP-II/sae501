@@ -1,44 +1,123 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.All{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+body{
+  background-color: var(--black);
+  height: 100vh;
+  overflow: hidden;
+  margin: 0 !important;  /* Pour éviter qu'il y ai une margin de 8px a cause de la bibliothèque qui gere la reconnaissance du type de l'appareil */
+}
+
+.wrapper span{
+  position: fixed;
+  animation: animate 2s linear infinite;
+}
+
+.wrapper span i{
+  color: var(--white);
+}
+
+.wrapper span:nth-child(1){
+  left: 60%;
+  animation-delay: 0.6s;
+  top: 5%;
+  font-size: 2px;
+;
+}
+
+.wrapper span:nth-child(2){
+  left: 10%;
+  animation-delay: 2s;
+  top: 40%;
+  font-size: 3px;
+}
+.wrapper span:nth-child(3){
+  font-size: 6px;
+  left: 20%;
+  animation-delay: 5s;
+  top: 15%;
+}
+.wrapper span:nth-child(4){
+  font-size: 4px;
+  left: 26%;
+  animation-delay:4s;
+  top: 67%;
+}
+.wrapper span:nth-child(5){
+  font-size: 5px;
+  left: 40%;
+  animation-delay: 0.5s;
+  top: 85%;
+}
+
+.wrapper span:nth-child(6){
+  font-size: 3px;
+  left: 50%;
+  animation-delay: 5s;
+  top: 23%;
+}
+.wrapper span:nth-child(7){
+  font-size: 3px;
+  left: 60%;
+  animation-delay: 6s;
+  top: 65%;
+}
+.wrapper span:nth-child(8){
+  font-size: 4px;
+  left: 70%;
+  animation-delay: 3.5s;
+  top: 12%;
+}
+
+.wrapper span:nth-child(9){
+  font-size: 6px;
+  left: 80%;
+  animation-delay: 9s;
+  top: 75%;
+}
+
+.wrapper span:nth-child(10){
+  font-size: 4px;
+  left: 90%;
+  animation-delay: 3s;
+  top: 14%;
+}
+
+.box-area{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  max-width: 320px;
+  z-index: 1;
+}
+
+.text-area{
+  -webkit-text-fill-color: var(--white);
+  font-family: var(--font-family-amatic);
+}
+
+
+@keyframes animate {
+  0%{
+    opacity: 0;
   }
-  to {
-    transform: rotate(360deg);
+  50%{
+    opacity: 1;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  100%{
+    opacity: 0;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
 
 
