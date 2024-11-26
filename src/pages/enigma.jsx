@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export default function Game() {
+
     const [question, setQuestion] = useState(null);
 
     useEffect(() => {
