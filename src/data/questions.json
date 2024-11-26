@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "question": "Quelle est la capitale de la France ?",
+    "answer": "Paris",
+    "type": "texte"
+  },
+  {
+    "id": 2,
+    "question": "Combien font 5 + 7 ?",
+    "answer": "12",
+    "type": "nombre"
+  },
+  {
+    "id": 3,
+    "question": "Quel est le plus grand océan du monde ?",
+    "answer": "Pacifique",
+    "type": "texte"
+  },
+  {
+    "id": 4,
+    "question": "Dans quel pays se trouve la statue de la Liberté ?",
+    "answer": "États-Unis",
+    "type": "texte"
+  },
+  {
+    "id": 5,
+    "question": "Quelle planète est connue comme la planète rouge ?",
+    "answer": "Mars",
+    "type": "texte"
+  }
+]
