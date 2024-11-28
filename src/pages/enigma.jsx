@@ -6,7 +6,7 @@ export default function Game() {
 
     useEffect(() => {
         const fetchRandomQuestion = async () => {
-            const response = await fetch('/api/enigma'); // Charge toutes les questions
+            const response = await fetch('/api/question/enigma'); // Charge toutes les questions
             const questions = await response.json();
             const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
             setQuestion(randomQuestion); // Choisit une question aléatoire
