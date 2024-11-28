@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
         if (id) {
             // -----------------------------------------------------RÉCUPERE PAR ID---------------------------------------------------------//
-            const player = await prisma.player.findUnique({
+            const player = await prisma.players.findUnique({
                 where: { id: parseInt(id) },
             });
 
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
             res.status(200).json(player);
         } else if (sessionId) {
             // -----------------------------------------------------RÉCUPERE PAR SESSION---------------------------------------------------------//
-            const players = await prisma.player.findMany({
+            const players = await prisma.players.findMany({
                 where: { sessionId: parseInt(sessionId) },
             });
 
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
             res.status(200).json(players);
         } else {
             // -----------------------------------------------------RÉCUPERE TOUT SI PAS D'ID ET SESSION---------------------------------------------------------//
-            const players = await prisma.player.findMany();
+            const players = await prisma.players.findMany();
             res.status(200).json(players);
         }
     } else if (req.method === 'POST') {

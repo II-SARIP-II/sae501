@@ -25,15 +25,19 @@ async function generateFakeSession() {
 }
 
 async function generateFakeSuspect(sessionId) {
+    const fullName = faker.person.fullName(); // Générez le nom complet
+    const truncatedName = fullName.length > 25 ? fullName.slice(0, 25) : fullName; // Truncate if it's longer than 25 characters
+
     return {
         sessionId,
-        name: faker.person.fullName(), // Mise à jour ici
+        name: truncatedName,
         description: faker.lorem.sentence(),
         hints: faker.lorem.sentence(),
     };
 }
 
-async function generateFakeData() {
+
+async function seed() {
     for (let i = 0; i < 10; i++) {
         const fakeSession = await generateFakeSession();
         const session = await prisma.sessions.create({
@@ -61,7 +65,7 @@ async function generateFakeData() {
     }
 }
 
-generateFakeData()
+seed()
     .catch((e) => {
         console.error(e);
         process.exit(1);
