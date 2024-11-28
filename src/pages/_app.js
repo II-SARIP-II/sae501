@@ -1,17 +1,34 @@
-import '../styles/App.css'; // Importer les styles globaux (y compris Tailwind)
+import '../styles/App.css';
+import '../styles/index.css';
 import Head from 'next/head';
 import React from "react";
-import Header from "../components/_header";
+
 function MyApp({ Component, pageProps }) {
     return (
         <>
             <Head>
-                <title>PARMI NOUS</title>
+                <title>Parmi Nous</title>
                 {/*<link rel="icon" href="/flavicon.ico"/>*/}
             </Head>
-            <Header />
+
+            {/* Fond étoilé */}
+            <div className="wrapper fixed inset-0 -z-10">
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+                <span><i className="fa fa-star"></i></span>
+            </div>
+
             {/* Le composant de la page courante */}
-            <Component {...pageProps} />
+            <div className="px-12 md:px-8">
+                <Component {...pageProps} />
+            </div>
         </>
     );
 }
