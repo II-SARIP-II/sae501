@@ -20,7 +20,7 @@
   {
     "id": 4,
     "question": "Dans quel pays se trouve la statue de la Liberté ?",
-    "answer": "États-Unis",
+    "answer": ["USA","usa", "etats-unis", "etat-unis"],
     "type": "texte"
   },
   {
