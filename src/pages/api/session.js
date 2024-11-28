@@ -1,115 +1,89 @@
-const express = require('express');
-const { PrismaClient } = require('@prisma/client');
-const app = express();
+// pages/api/session.js
+import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-app.use(express.json());
+export default async function handler(req, res) {
+    if (req.method === 'GET') {
+        const { id } = req.query;
 
-// Récupérer toutes les sessions
-app.get('/api/sessions', async (req, res) => {
-    try {
-        const sessions = await prisma.sessions.findMany({
-            include: { Players: true, Suspects: true }, // Inclure les joueurs et suspects associés
-        });
-        res.json({ message: 'Success', data: sessions });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+        if(id){
+            // -----------------------------------------------------RÉCUPERE SESSION PAR ID---------------------------------------------------------//
+            const session = await prisma.sessions.findUnique({
+                where: { id: parseInt(id) },
+            });
+            if (!session) {
+                return res.status(404).json({ message: 'Session not found' });
+            }
+        } else {
+            // -----------------------------------------------------RÉCUPERE SESSIONS---------------------------------------------------------//
+            const sessions = await prisma.sessions.findMany();
+            res.status(200).json(sessions);
+        }
 
-// Récupérer une session par ID
-app.get('/api/sessions/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const session = await prisma.sessions.findUnique({
-            where: { id: parseInt(id) },
-            include: { Players: true, Suspects: true }, // Inclure les joueurs et suspects associés
-        });
-        res.json({ message: 'Success', data: session });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Créer une nouvelle session
-app.post('/api/sessions', async (req, res) => {
-    const { name, code, space_left, total_questions, saboteur_id } = req.body;
-    try {
-        const newSession = await prisma.sessions.create({
+    } else if (req.method === 'POST') {
+        //-----------------------------------------------------CRÉE UNE SESSION---------------------------------------------------------//
+        const { name, code, spaceLeft, status, totalQuestions, killerId, saboteurId } = req.body;
+        const session = await prisma.sessions.create({
             data: {
                 name,
                 code,
-                space_left,
-                total_questions,
-                saboteur_id, // le saboteur_id si nécessaire
-            },
-        });
-        res.json({ message: 'Session créée avec succès', data: newSession });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Mettre à jour une session
-app.put('/api/sessions/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, code, space_left, status, total_questions, killer_id, saboteur_id } = req.body;
-
-    try {
-        const updatedSession = await prisma.sessions.update({
-            where: { id: parseInt(id) },
-            data: {
-                name,
-                code,
-                space_left,
+                spaceLeft,
                 status,
-                total_questions,
-                killer_id, // Mise à jour du tueur
-                saboteur_id, // Mise à jour du saboteur
+                totalQuestions,
+                killerId,
+                saboteurId,
             },
         });
-        res.json({ message: 'Session mise à jour avec succès', data: updatedSession });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+        res.status(201).json(session);
+    } else if (req.method === 'PUT') {
+        // -----------------------------------------------------MET A JOUR SESSION PAR ID---------------------------------------------------------//
+        const { id, name, code, spaceLeft, status, totalQuestions, killerId, saboteurId } = req.body;
 
-app.post('/api/players', async (req, res) => {
-    const { session_id, name, role, is_ready, score, game_data } = req.body;
-    try {
-        const newPlayer = await prisma.players.create({
+        // Vérifier si la session existe
+        const existingSession = await prisma.sessions.findUnique({
+            where: { id },
+        });
+
+        if (!existingSession) {
+            return res.status(404).json({ message: 'Session not found' });
+        }
+
+        // Mettre à jour la session
+        const updatedSession = await prisma.sessions.update({
+            where: { id },
             data: {
-                session_id,
                 name,
-                role,      // 0 = player, 1 = saboteur
-                is_ready,
-                score,
-                game_data, // Données JSON liées au joueur
+                code,
+                spaceLeft,
+                status,
+                totalQuestions,
+                killerId,
+                saboteurId,
             },
         });
-        res.json({ message: 'Joueur ajouté avec succès', data: newPlayer });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
-app.post('/api/suspects', async (req, res) => {
-    const { session_id, name, description, hints, is_killer } = req.body;
-    try {
-        const newSuspect = await prisma.suspects.create({
-            data: {
-                session_id,
-                name,
-                description,
-                hints,
-            },
+        res.status(200).json(updatedSession);
+    } else if (req.method === 'DELETE') {
+        // -----------------------------------------------------DELETE SESSION PAR ID---------------------------------------------------------//
+        const { id } = req.query;
+
+        // Vérifier si la session existe
+        const existingSession = await prisma.sessions.findUnique({
+            where: { id: parseInt(id) },
         });
-        res.json({ message: 'Suspect ajouté avec succès', data: newSuspect });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+
+        if (!existingSession) {
+            return res.status(404).json({ message: 'Session not found' });
+        }
+
+        // Supprimer la session
+        await prisma.sessions.delete({
+            where: { id: parseInt(id) },
+        });
+
+        res.status(200).json({ message: 'Session deleted successfully' });
+    } else {
+        res.status(405).json({ message: 'Method Not Allowed' });
     }
-});
-
-
-
-REFAIRE CETTE PAGE ET D2COUPER CORRECTEMENT
+}
