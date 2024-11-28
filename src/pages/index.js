@@ -59,19 +59,19 @@ export default function Index() {
                         <Link href="/createGame" passHref>
                             <Button
                                 label="Créer partie"
-                                className="w-full mb-4 bg-black text-white border-white"
+                                className="mb-4 bg-black text-white border-white"
                             />
                         </Link>
                         <Link href="/joinGame" passHref>
                             <Button
                                 label="Rejoindre partie"
-                                className="w-full mb-4 bg-black text-white border-white"
+                                className="mb-4 bg-black text-white border-white"
                             />
                         </Link>
                         <Link href="/" passHref>
                             <Button
                                 label="Règles"
-                                className="w-full bg-black text-red-500 border-red-500"
+                                className="bg-black text-red-500 border-red-500"
                             />
                         </Link>
                     </div>

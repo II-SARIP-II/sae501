@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../components/_button';
+import Link from 'next/link';
 
 export default function CreateGame() {
     const [sessionCode, setSessionCode] = useState('');
@@ -53,13 +54,21 @@ export default function CreateGame() {
                     <Button
                         label="Créer la partie"
                         onClick={handleCreateSession}
-                        className="w-full py-3 bg-black text-green-500 border-green-500 rounded-lg mt-24"
+                        className="py-3 bg-black text-green-500 border-green-500 mt-12"
                     />
                 ) : (
-                    <p className="text-center text-lg font-Amatic text-green-500 mt-24">
+                    <p className="text-center text-lg font-Amatic text-green-500 mt-12">
                         La session a été créée. Aucun autre utilisateur ne peut la rejoindre.
                     </p>
                 )}
+                <div className="mt-2">
+                    <Link href="/">
+                        <Button
+                            label="Annuler"
+                            className="py-3 bg-black text-red-500 border-red-500"
+                        />
+                    </Link>
+                </div>
             </div>
         </div>
     );
