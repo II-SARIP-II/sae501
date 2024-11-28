@@ -7,17 +7,17 @@ import TextInput from "../components/_textInput";
 export default function JoinGame({ setSessionData, sessionData }) {
     const [sessionCodeInput, setSessionCodeInput] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [pseudo, setPseudo] = useState('');
     const router = useRouter();
 
     const handleJoinGame = () => {
-        if (!pseudo.trim()) {
-            setErrorMessage('Veuillez renseigner un pseudo.');
+        const pseudo = localStorage.getItem('userPseudo'); // Récupère le pseudo depuis localStorage
+        if (!pseudo) {
+            setErrorMessage('Veuillez configurer votre pseudo sur la page Profil.');
             return;
         }
 
         if (sessionData?.code === sessionCodeInput) {
-            // ajout user
+            // Ajoute l'utilisateur à la session
             const updatedUsers = [...(sessionData.users || []), pseudo];
             setSessionData({
                 ...sessionData,
@@ -37,17 +37,10 @@ export default function JoinGame({ setSessionData, sessionData }) {
                 <div className="mb-6">
                     <TextInput
                         type="text"
-                        placeholder="Entrez votre pseudo"
-                        value={pseudo}
-                        onChange={(e) => setPseudo(e.target.value)}
-                        className="w-full text-white bg-black border-white rounded-lg mb-4"
-                    />
-                    <TextInput
-                        type="text"
                         placeholder="Entrez le code de session"
                         value={sessionCodeInput}
                         onChange={(e) => setSessionCodeInput(e.target.value)}
-                        className="w-full text-white bg-black border-white rounded-lg mb-4"
+                        className="w-full text-white bg-black border-white rounded-lg mt-16 mb-16"
                     />
                 </div>
                 {errorMessage && (
