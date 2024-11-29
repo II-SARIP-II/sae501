@@ -7,8 +7,10 @@ import Button from '../components/_button';
 
 export default function Index() {
     const [isMobileDevice, setIsMobileDevice] = useState(false);
+    const [userPseudo, setUserPseudo] = useState('');
 
     useEffect(() => {
+        // Vérifier si l'utilisateur est sur un mobile
         const checkDevice = () => {
             setIsMobileDevice(window.innerWidth <= 768);
         };
@@ -19,6 +21,14 @@ export default function Index() {
         return () => {
             window.removeEventListener('resize', checkDevice);
         };
+    }, []);
+
+    useEffect(() => {
+        // Récupérer le pseudo stocké dans le sessionStorage
+        const storedPseudo = sessionStorage.getItem('userPseudo');
+        if (storedPseudo) {
+            setUserPseudo(storedPseudo);
+        }
     }, []);
 
     return (
@@ -32,6 +42,14 @@ export default function Index() {
             {isMobileDevice && (
                 <div className="box-area flex flex-col items-center justify-center">
                     <h1 className="text-6xl font-Amatic text-white mb-24">Parmi Nous</h1>
+
+                    {/* Affichage du pseudo si disponible */}
+                    {userPseudo && (
+                        <p className="text-2xl text-yellow-400 font-Amatic mb-8">
+                            Bienvenue, <span className="font-bold">{userPseudo}</span> !
+                        </p>
+                    )}
+
                     <div className="w-4/5 max-w-md">
                         <Link href="/profile" passHref>
                             <Button

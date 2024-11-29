@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Button from '../components/_button';
 import Link from 'next/link';
 
@@ -6,6 +7,15 @@ export default function CreateGame() {
     const [sessionCode, setSessionCode] = useState('');
     const [users, setUsers] = useState([]);
     const [sessionCreated, setSessionCreated] = useState(false);
+    const router = useRouter();
+
+    // Vérification de la présence du pseudo
+    useEffect(() => {
+        const pseudo = sessionStorage.getItem('userPseudo');
+        if (!pseudo) {
+            router.push('/profile'); // redirige vers le profil si y a pas de pseudo
+        }
+    }, [router]);
 
     const generateCode = () => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
