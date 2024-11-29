@@ -11,7 +11,6 @@ export default function Index() {
     const [userPseudo, setUserPseudo] = useState('');
 
     useEffect(() => {
-        // Vérifier si l'utilisateur est sur un mobile
         const checkDevice = () => {
             setIsMobileDevice(window.innerWidth <= 768);
         };
@@ -19,18 +18,17 @@ export default function Index() {
         checkDevice();
         window.addEventListener('resize', checkDevice);
 
+        const storedPlayer = sessionStorage.getItem('userData');
+        if (storedPlayer) {
+            const playerData = JSON.parse(storedPlayer);
+            setUserPseudo(playerData.name);
+        }
+
         return () => {
             window.removeEventListener('resize', checkDevice);
         };
     }, []);
 
-    useEffect(() => {
-        // Récupérer le pseudo stocké dans le sessionStorage
-        const storedPseudo = sessionStorage.getItem('userPseudo');
-        if (storedPseudo) {
-            setUserPseudo(storedPseudo);
-        }
-    }, []);
     //-------------------------------------------------------CRÉER UNE SESSION-------------------------------------------------------//
     const generateCode = () => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
