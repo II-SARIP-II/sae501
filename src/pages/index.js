@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../styles/App.css';
 import '../styles/index.css';
@@ -9,18 +10,33 @@ import axios from "axios";
 export default function Index() {
     const [isMobileDevice, setIsMobileDevice] = useState(false);
     const [userPseudo, setUserPseudo] = useState('');
+    const router = useRouter();
 
+    // Fonction utilitaire pour vérifier l'appareil
+    const checkDevice = () => {
+        setIsMobileDevice(window.innerWidth <= 768);
+    };
+
+    // Fonction utilitaire pour récupérer les données utilisateur
+    const getStoredUserData = () => {
+        try {
+            const storedPlayer = sessionStorage.getItem('userData');
+            if (storedPlayer) {
+                return JSON.parse(storedPlayer);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données utilisateur:', error);
+        }
+        return null;
+    };
+
+    // useEffect pour vérifier le mobile et charger les données utilisateur
     useEffect(() => {
-        const checkDevice = () => {
-            setIsMobileDevice(window.innerWidth <= 768);
-        };
-
         checkDevice();
         window.addEventListener('resize', checkDevice);
 
-        const storedPlayer = sessionStorage.getItem('userData');
-        if (storedPlayer) {
-            const playerData = JSON.parse(storedPlayer);
+        const playerData = getStoredUserData();
+        if (playerData) {
             setUserPseudo(playerData.name);
         }
 
@@ -29,7 +45,7 @@ export default function Index() {
         };
     }, []);
 
-    //-------------------------------------------------------CRÉER UNE SESSION-------------------------------------------------------//
+    // Générer un code unique
     const generateCode = () => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let code = '';
@@ -39,9 +55,18 @@ export default function Index() {
         return code;
     };
 
+    // Créer une session
     const createGame = async () => {
+        const storedPlayer = getStoredUserData();
+
+        if (!storedPlayer) {
+            alert("Veuillez d'abord créer un profil.");
+            router.push('/profile');
+            return;
+        }
+
         try {
-            //CRÉATION DE SESSION + garder ID de la session
+            // CRÉATION DE SESSION
             const sessionResponse = await axios.post('/api/session', {
                 code: generateCode(),
                 playersNumber: 1,
@@ -49,23 +74,22 @@ export default function Index() {
             });
             console.log('Session créée avec succès :', sessionResponse.data.id);
 
-
-            //MIS A JOUR DE PLAYER LOCAL (ici fictif) SESSIONID PREND LA VALEUR DE L'ID DE LA SESSION CRÉÉE
-            const playerResponse = await axios.put(`/api/player`, {
-                id: 252,
+            // MISE À JOUR DU JOUEUR
+            const playerResponse = await axios.put('/api/player', {
+                id: storedPlayer.id,
                 sessionId: sessionResponse.data.id,
             });
             console.log('Player mis à jour :', playerResponse.data);
 
-            return {
-                session: sessionResponse.data,
-                player: playerResponse.data,
-            };
+            // Mise à jour du sessionStorage
+            const updatedUserData = { ...playerResponse.data, sessionId: sessionResponse.data.id };
+            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+            console.log('Session storage mis à jour avec :', updatedUserData);
+
+            router.push('/createGame');
         } catch (error) {
-            console.error(
-                'Erreur lors de la création de la session ou de la mise à jour du joueur :',
-                error.response?.data || error.message
-            );
+            console.error('Erreur lors de la création de la session ou de la mise à jour du joueur :', error);
+            alert('Une erreur est survenue lors de la création de la partie. Veuillez réessayer.');
         }
     };
 
@@ -95,13 +119,11 @@ export default function Index() {
                                 className="mb-4 bg-black text-white border-white"
                             />
                         </Link>
-                        {/*<Link href="/createGame" passHref>*/}
-                            <Button
-                                label="Créer partie"
-                                className="mb-4 bg-black text-white border-white"
-                                onClick={createGame}
-                            />
-                        {/*</Link>*/}
+                        <Button
+                            label="Créer partie"
+                            className="mb-4 bg-black text-white border-white"
+                            onClick={createGame}
+                        />
                         <Link href="/joinGame" passHref>
                             <Button
                                 label="Rejoindre partie"

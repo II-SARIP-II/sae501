@@ -13,7 +13,7 @@ export default function CreateGame() {
 
     // Vérification de la présence du pseudo
     useEffect(() => {
-        const pseudo = sessionStorage.getItem('userPseudo');
+        const pseudo = sessionStorage.getItem('userData');
         if (!pseudo) {
             router.push('/profile'); // redirige vers le profil si y a pas de pseudo
         }
