@@ -49,13 +49,21 @@ export default function Index() {
     const generateCode = () => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let code = '';
-        for (let i = 0; i < 6; i++) {
+
+        // Ajouter une partie aléatoire du code
+        for (let i = 0; i < 6; i++) { // 6 caractères aléatoires
             code += characters.charAt(Math.floor(Math.random() * characters.length));
         }
+
+        // Ajouter une partie de l'horodatage pour garantir l'unicité
+        const timestamp = Date.now().toString(36); // Convertir le timestamp en base 36
+        code += timestamp.slice(-4); // Utiliser seulement les 4 derniers caractères du timestamp
+
         return code;
     };
 
-    // Créer une session
+
+    // Créer une session + update Player -> SessionId + mise a jour du session storage
     const createGame = async () => {
         const storedPlayer = getStoredUserData();
 
@@ -72,21 +80,18 @@ export default function Index() {
                 playersNumber: 1,
                 status: 0,
             });
-            console.log('Session créée avec succès :', sessionResponse.data.id);
 
             // MISE À JOUR DU JOUEUR
             const playerResponse = await axios.put('/api/player', {
                 id: storedPlayer.id,
                 sessionId: sessionResponse.data.id,
             });
-            console.log('Player mis à jour :', playerResponse.data);
 
             // Mise à jour du sessionStorage
             const updatedUserData = { ...playerResponse.data, sessionId: sessionResponse.data.id };
             sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
-            console.log('Session storage mis à jour avec :', updatedUserData);
-
             router.push('/createGame');
+
         } catch (error) {
             console.error('Erreur lors de la création de la session ou de la mise à jour du joueur :', error);
             alert('Une erreur est survenue lors de la création de la partie. Veuillez réessayer.');
