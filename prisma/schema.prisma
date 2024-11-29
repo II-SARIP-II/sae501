@@ -19,13 +19,13 @@ model Players {
 }
 
 model Sessions {
-  id             Int      @id @default(autoincrement())
-  code           String   @db.VarChar(10) // Limite le code de la session à 10 caractères
-  playersNumber  Int
-  createdAt      DateTime @default(now())
-  status         Int // Statut de la session
-  totalQuestions Int
-  killerId       Int?
+  id            Int      @id @default(autoincrement())
+  code          String   @db.VarChar(10) // Limite le code de la session à 10 caractères
+  playersNumber Int
+  createdAt     DateTime @default(now())
+  status        Int // Statut de la session
+  questions     Int
+  killerId      Int?
 
   Players  Players[] // Relation un-à-plusieurs avec Players
   Suspects Suspects[] // Relation un-à-plusieurs avec Suspects
