@@ -17,7 +17,7 @@ export default function Profile() {
         try {
             const response = await axios.post('/api/player', { name: pseudo });
             if (response.status === 201) {
-                sessionStorage.setItem('userPseudo', pseudo);
+                sessionStorage.setItem('userData', JSON.stringify(response.data));
                 router.push('/');
             }
         } catch (err) {
