@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     } else if (req.method === 'POST') {
         // -----------------------------------------------------Crée un nouveau player---------------------------------------------------------//
         const { sessionId, name, role, score, gameData } = req.body;
-        const player = await prisma.player.create({
+        const player = await prisma.players.create({
             data: {
                 sessionId,
                 name,
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         const { id, sessionId, name, role, score, gameData } = req.body;
 
         // Vérifier si le joueur existe
-        const existingPlayer = await prisma.player.findUnique({
+        const existingPlayer = await prisma.players.findUnique({
             where: { id },
         });
 
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
         }
 
         // Mettre à jour les données du joueur
-        const updatedPlayer = await prisma.player.update({
+        const updatedPlayer = await prisma.players.update({
             where: { id },
             data: {
                 sessionId,
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
     {
         const { id } = req.query;
 
-        const existingPlayer = await prisma.player.findUnique({
+        const existingPlayer = await prisma.players.findUnique({
             where: { id: parseInt(id) },
         });
 
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        await prisma.player.delete({
+        await prisma.players.delete({
             where: { id: parseInt(id) },
         });
 
