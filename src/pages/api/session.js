@@ -23,22 +23,18 @@ export default async function handler(req, res) {
 
     } else if (req.method === 'POST') {
         //-----------------------------------------------------CRÉE UNE SESSION---------------------------------------------------------//
-        const { name, code, spaceLeft, status, totalQuestions, killerId, saboteurId } = req.body;
+        const { code, playersNumber, status } = req.body;
         const session = await prisma.sessions.create({
             data: {
-                name,
                 code,
-                spaceLeft,
+                playersNumber,
                 status,
-                totalQuestions,
-                killerId,
-                saboteurId,
             },
         });
         res.status(201).json(session);
     } else if (req.method === 'PUT') {
         // -----------------------------------------------------MET A JOUR SESSION PAR ID---------------------------------------------------------//
-        const { id, name, code, spaceLeft, status, totalQuestions, killerId, saboteurId } = req.body;
+        const { id, code, playersNumber, status, questions, killerId } = req.body;
 
         // Vérifier si la session existe
         const existingSession = await prisma.sessions.findUnique({
@@ -49,17 +45,14 @@ export default async function handler(req, res) {
             return res.status(404).json({ message: 'Session not found' });
         }
 
-        // Mettre à jour la session
         const updatedSession = await prisma.sessions.update({
             where: { id },
             data: {
-                name,
                 code,
-                spaceLeft,
+                playersNumber,
                 status,
-                totalQuestions,
+                questions,
                 killerId,
-                saboteurId,
             },
         });
 

@@ -14,13 +14,11 @@ async function generateFakePlayer(sessionId) {
 
 async function generateFakeSession() {
     return {
-        name: faker.string.alphanumeric(10),
         code: faker.string.alphanumeric(10),
-        spaceLeft: faker.number.int({ min: 1, max: 10 }),
-        status: faker.number.int({ min: 0, max: 3 }), // Exemple de statut
-        totalQuestions: faker.number.int({ min: 5, max: 50 }),
-        killerId: null, // Vous pouvez générer un ID valide si nécessaire
-        saboteurId: null, // Idem pour saboteurId
+        playersNumber: faker.number.int({ min: 1, max: 6 }),
+        status: faker.number.int({ min: 0, max: 1 }), //0 = rejoignable, 1 = injoignable
+        questions: faker.number.int({ min: 5, max: 50 }),
+        killerId: null,
     };
 }
 

@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
             res.status(200).json(updatedPlayer);
 
-        } else if (req.method === 'DELETE') {
+      } else if (req.method === 'DELETE') {
             const { id } = req.query;
 
             const existingPlayer = await prisma.players.findUnique({
@@ -75,6 +75,7 @@ export default async function handler(req, res) {
             await prisma.players.delete({
                 where: { id: parseInt(id) },
             });
+
 
             res.status(200).json({ message: 'Player deleted successfully' });
         } else {

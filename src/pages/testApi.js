@@ -11,7 +11,7 @@ export default function TestApi() {
         const fetchPlayers = async () => {
             try {
                 const response = await axios.get('/api/player');
-                setPlayers(response.data); // Stocker les joueurs dans l'état
+                setPlayers(response.data);
             } catch (err) {
                 console.error('Error fetching players:', err);
                 setError('Une erreur est survenue lors de la récupération des joueurs.');
