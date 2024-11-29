@@ -1,14 +1,29 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 import Button from '../components/_button';
 
 export default function Profile() {
     const [pseudo, setPseudo] = useState('');
+    const [error, setError] = useState(null);
     const router = useRouter();
 
-    const handleSavePseudo = () => {
-        localStorage.setItem('userPseudo', pseudo);
-        router.push('/');
+    const handleSavePseudo = async () => {
+        if (!pseudo.trim()) {
+            setError('Le pseudo ne peut pas être vide.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/player', { name: pseudo });
+            if (response.status === 201) {
+                sessionStorage.setItem('userPseudo', pseudo);
+                router.push('/');
+            }
+        } catch (err) {
+            console.error('Erreur lors de la création du profil :', err);
+            setError('Une erreur est survenue. Veuillez réessayer.');
+        }
     };
 
     return (
@@ -25,6 +40,7 @@ export default function Profile() {
                     onChange={(e) => setPseudo(e.target.value)}
                     className="w-full p-3 bg-black text-white border border-gray-500 rounded-lg mb-6"
                 />
+                {error && <p className="text-red-500 mb-4">{error}</p>}
                 <Button
                     label="Enregistrer"
                     onClick={handleSavePseudo}

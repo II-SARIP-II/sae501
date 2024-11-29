@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Button from '../components/_button';
 import Link from "next/link";
@@ -7,12 +7,22 @@ import TextInput from "../components/_textInput";
 export default function JoinGame({ setSessionData, sessionData }) {
     const [sessionCodeInput, setSessionCodeInput] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [pseudo, setPseudo] = useState('');
     const router = useRouter();
 
+    // Vérification du pseudo au chargement de la page
+    useEffect(() => {
+        const storedPseudo = sessionStorage.getItem('userPseudo');
+        if (!storedPseudo) {
+            router.push('/profile');
+        } else {
+            setPseudo(storedPseudo);
+        }
+    }, [router]);
+
     const handleJoinGame = () => {
-        const pseudo = localStorage.getItem('userPseudo'); // Récupère le pseudo depuis localStorage
-        if (!pseudo) {
-            setErrorMessage('Veuillez configurer votre pseudo sur la page Profil.');
+        if (!sessionCodeInput) {
+            setErrorMessage('Veuillez entrer un code de session valide.');
             return;
         }
 
