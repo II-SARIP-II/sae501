@@ -8,35 +8,36 @@ datasource db {
 }
 
 model Players {
-  id        Int     @id @default(autoincrement())
-  sessionId Int
-  name      String  @db.VarChar(50) // Limite le nom à 50 caractères
-  role      Int // 0 = innocent, 1 = saboteur
-  score     Int
-  gameData  String?
+  id        Int       @id @default(autoincrement())
+  sessionId Int?
+  name      String?   @db.VarChar(50)
+  role      Int?
+  score     Int?
+  gameData  String?   @db.Text
+  Session   Sessions? @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Players_ibfk_1")
 
-  Session Sessions @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  @@index([sessionId], map: "sessionId")
 }
 
 model Sessions {
-  id            Int      @id @default(autoincrement())
-  code          String   @db.VarChar(10) // Limite le code de la session à 10 caractères
+  id            Int        @id @default(autoincrement())
+  code          String     @db.VarChar(10)
   playersNumber Int
-  createdAt     DateTime @default(now())
-  status        Int // Statut de la session
-  questions     Int
+  createdAt     DateTime?  @default(now()) @db.DateTime(0)
+  status        Int?
+  questions     Int?
   killerId      Int?
-
-  Players  Players[] // Relation un-à-plusieurs avec Players
-  Suspects Suspects[] // Relation un-à-plusieurs avec Suspects
+  Players       Players[]
+  Suspects      Suspects[]
 }
 
 model Suspects {
-  id          Int    @id @default(autoincrement())
-  sessionId   Int
-  name        String @db.VarChar(25)
-  description String
-  hints       String
+  id          Int       @id @default(autoincrement())
+  sessionId   Int?
+  name        String?   @db.VarChar(25)
+  description String?   @db.Text
+  hints       String?   @db.Text
+  Session     Sessions? @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Suspects_ibfk_1")
 
-  Session Sessions @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  @@index([sessionId], map: "sessionId")
 }
