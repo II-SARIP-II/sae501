@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export default async function handler(req, res) {
     try {
         if (req.method === 'GET') {
-            const {id} = req.query;
+            const {id, code} = req.query;
             if (id) {
                 // -----------------------------------------------------RÉCUPERE SESSION PAR ID---------------------------------------------------------//
                 const session = await prisma.sessions.findUnique({
@@ -16,6 +16,17 @@ export default async function handler(req, res) {
                     return res.status(404).json({message: 'Session not found'});
                 }
                 res.status(200).json(session);
+            } else if (code) { console.log("start")
+                    // -----------------------------------------------------RÉCUPERE SESSION PAR ID---------------------------------------------------------//
+                    const session = await prisma.sessions.findFirst({
+                        where: {code: code},
+                    });
+                console.log("had fetched")
+                    if (!session) {
+                        return res.status(404).json({message: 'Session not found'});
+                    }
+                    res.status(200).json(session);
+                console.log("returned")
             } else {
                 // -----------------------------------------------------RÉCUPERE SESSIONS---------------------------------------------------------//
                 const sessions = await prisma.sessions.findMany();
@@ -24,12 +35,13 @@ export default async function handler(req, res) {
 
         } else if (req.method === 'POST') {
             //-----------------------------------------------------CRÉE UNE SESSION---------------------------------------------------------//
-            const {code, playersNumber, status} = req.body;
+            const {code, playersNumber, status, hostId} = req.body;
             const session = await prisma.sessions.create({
                 data: {
                     code,
                     playersNumber,
                     status,
+                    hostId,
                 },
             });
             res.status(201).json(session);

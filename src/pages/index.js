@@ -79,6 +79,7 @@ export default function Index() {
                 code: generateCode(),
                 playersNumber: 1,
                 status: 0,
+                hostId: storedPlayer.id
             });
 
             // MISE À JOUR DU JOUEUR
@@ -90,7 +91,7 @@ export default function Index() {
             // Mise à jour du sessionStorage
             const updatedUserData = { ...playerResponse.data, sessionId: sessionResponse.data.id };
             sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
-            router.push('/createGame');
+            router.push('/salon');
 
         } catch (error) {
             console.error('Erreur lors de la création de la session ou de la mise à jour du joueur :', error);
