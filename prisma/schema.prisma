@@ -21,12 +21,13 @@ model Players {
 
 model Sessions {
   id            Int        @id @default(autoincrement())
-  code          String     @db.VarChar(10)
-  playersNumber Int
+  code          String     @unique @db.VarChar(10)
+  playersNumber Int?
   createdAt     DateTime?  @default(now()) @db.DateTime(0)
   status        Int?
   questions     Int?
   killerId      Int?
+  hostId        Int?
   Players       Players[]
   Suspects      Suspects[]
 }
