@@ -3,6 +3,8 @@ import Button from '../components/_button';
 import Link from 'next/link';
 import axios from 'axios';
 import io from 'socket.io-client';
+import {emit} from "next/dist/client/components/react-dev-overlay/pages/bus";
+import {router} from "next/client";
 
 export default function Salon() {
     const [session, setSession] = useState(null);
@@ -30,6 +32,7 @@ export default function Salon() {
             const response = await axios.get('/api/session', {
                 params: { id: sessionId },
             });
+            console.log("session",response.data)
             setSession(response.data);
         } catch (error) {
             console.error('Erreur lors de la récupération de la session :', error);
@@ -81,7 +84,6 @@ export default function Salon() {
             });
 
             socketConnection.on('updatePlayers', (updatedPlayers) => {
-                console.log('Mise à jour des joueurs reçue:', updatedPlayers);
                 setPlayers(updatedPlayers);
             });
 
@@ -106,6 +108,33 @@ export default function Salon() {
             }
         }
     }, [players, session]);
+
+    const quitGame = async () =>{
+        const storedPlayer = getStoredUserData();
+        console.log("players" ,players[1])
+        if(isHost === true){
+            console.log("sessionId", session.id)
+            if (players[1]) {
+                const sessionResponse = await axios.put('/api/session', {
+                    id: session.id,
+                    hostId: players[1],
+                    playersNumber: session.playersNumber - 1,
+                    status: session.playersNumber === 6 ? 0 : undefined,
+                });
+                const playerResponse = await axios.put('/api/player', {
+                    id: storedPlayer.id,
+                    sessionId: null,
+                });
+            } else {
+                const sessionResponse = await axios.delete('/api/session', {
+                    params: {id: session.id}
+                })
+            }
+            router.push("/");
+        } else {
+            //router.push("/");
+        }
+    }
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center text-white">
@@ -154,12 +183,11 @@ export default function Salon() {
                         )}
 
                         <div className="mt-2">
-                            <Link href="/">
                                 <Button
                                     label="Annuler"
+                                    onClick={quitGame}
                                     className="py-3 bg-black text-red-500 border-red-500"
                                 />
-                            </Link>
                         </div>
                     </div>
                 </>
