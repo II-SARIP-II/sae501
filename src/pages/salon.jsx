@@ -109,32 +109,71 @@ export default function Salon() {
         }
     }, [players, session]);
 
-    const quitGame = async () =>{
+    const quitGame = async () => {
         const storedPlayer = getStoredUserData();
-        console.log("players" ,players[1])
-        if(isHost === true){
-            console.log("sessionId", session.id)
-            if (players[1]) {
+        if (!storedPlayer) {
+            console.error("Impossible de récupérer les données utilisateur.");
+            return;
+        }
+
+        console.log("Players:", players);
+        console.log("ishost",isHost)
+        if (isHost) {           //si on est host
+            console.log("Session ID:", session.id);
+            if (players.length > 1) {   //host + si il y a d'autres joueurs
+
+                const newHostId = players.find(player => player.id !== storedPlayer.id)?.id; //prendre un autre joueur de la session
+                console.log(newHostId)
+
                 const sessionResponse = await axios.put('/api/session', {
                     id: session.id,
-                    hostId: players[1],
-                    playersNumber: session.playersNumber - 1,
-                    status: session.playersNumber === 6 ? 0 : undefined,
+                    hostId: players.find(player => player.id !== storedPlayer.id),           //mettre l'autre joueur hote
+                    playersNumber: session.playersNumber - 1,                                //enlever le joueur parti du total
+                    status: session.playersNumber === 6 ? 0 : undefined,                     //changer le status pour rejoindre si la partie était full
                 });
-                const playerResponse = await axios.put('/api/player', {
-                    id: storedPlayer.id,
-                    sessionId: null,
-                });
-            } else {
+
+                console.log(sessionResponse.data)
+
+             } else {                   //host + si il y a pas d'autre joueur
+
+                // Supprimer la session s'il n'y a plus de joueurs
                 const sessionResponse = await axios.delete('/api/session', {
-                    params: {id: session.id}
-                })
+                    params: { id: session.id },
+                });
+
+                console.log(sessionResponse.data)
+
             }
-            router.push("/");
-        } else {
-            //router.push("/");
+            const playerResponse = await axios.put('/api/player', { //mettre a null la session du joueur dans la bdd
+                id: storedPlayer.id,
+                sessionId: null,
+            });
+
+            const updatedUserData = { ...playerResponse.data, sessionId: null };            //mettre a null la session du joueur en front
+            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+
+            await router.push("/"); //retour à index.js
+
+        } else {    //si on est pas host
+
+            const sessionResponse = await axios.put('/api/session', {
+                id: session.id,
+                playersNumber: session.playersNumber - 1,                           //enlever le nombre max de joueur
+                status: session.playersNumber === 6 ? 0 : undefined,                //rendre libre la partie si elle était full (6joueurs max)
+            });
+            console.log(sessionResponse.data)
+
+            const playerResponse = await axios.put('/api/player', { //mettre a null dans la bdd la session du joueur
+                id: storedPlayer.id,
+                sessionId: null,
+            });
+
+            const updatedUserData = { ...playerResponse.data, sessionId: null };    //mettre a null dans session storage la session du joueur
+            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+
+            router.push("/");       //retour a index.js
         }
-    }
+    };
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center text-white">

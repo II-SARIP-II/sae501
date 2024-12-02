@@ -56,7 +56,13 @@ export default async function handler(req, res) {
 
             const updatedPlayer = await prisma.players.update({
                 where: { id },
-                data: { sessionId, name, role, score, gameData },
+                data: {
+                    sessionId,
+                    name,
+                    role,
+                    score,
+                    gameData
+                },
             });
 
             res.status(200).json(updatedPlayer);
