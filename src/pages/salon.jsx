@@ -68,7 +68,7 @@ export default function Salon() {
             fetchPlayersBySessionId(storedPlayer.sessionId);
 
             // Initialisation de la connexion Socket.IO
-            const socketConnection = io('http://localhost:3001', {
+            const socketConnection = io('http://localhost:3000', {
                 path: '/api/socket',
             });
             setSocket(socketConnection);
