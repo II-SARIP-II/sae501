@@ -136,7 +136,7 @@ export default function Index() {
                                 className="mb-4 bg-black text-white border-white"
                             />
                         </Link>
-                        <Link href="/" passHref>
+                        <Link href="/rules" passHref>
                             <Button
                                 label="Règles"
                                 className="bg-black text-red-500 border-red-500"
