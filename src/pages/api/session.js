@@ -47,7 +47,7 @@ export default async function handler(req, res) {
             res.status(201).json(session);
         } else if (req.method === 'PUT') {
             // -----------------------------------------------------MET A JOUR SESSION PAR ID---------------------------------------------------------//
-            const {id, code, playersNumber, status, questions, killerId} = req.body;
+            const {id, code, playersNumber, status, hostId, questions, killerId} = req.body;
 
             // Vérifier si la session existe
             const existingSession = await prisma.sessions.findUnique({
@@ -64,6 +64,7 @@ export default async function handler(req, res) {
                     code,
                     playersNumber,
                     status,
+                    hostId,
                     questions,
                     killerId,
                 },

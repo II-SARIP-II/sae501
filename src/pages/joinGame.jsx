@@ -71,18 +71,12 @@ export default function JoinGame({ setSessionData, sessionData }) {
         });
 
         //update session playersNumber----------------------------//
-        if (session.playersNumber === 5){ //Si le nombre est de 5, mettre status a 1 car ils seront 6 avec la nouveau player et 6 est le maximum, donc 1 bloque l'entrée
-            const sessionResponse = await axios.put('/api/session', {
-                id: session.id,
-                playersNumber: session.playersNumber + 1,
-                status: 1,
-            });
-        } else {
-            const sessionResponse = await axios.put('/api/session', {
-                id: session.id,
-                playersNumber: session.playersNumber + 1,
-            });
-        }
+        const sessionResponse = await axios.put('/api/session', {
+            id: session.id,
+            playersNumber: session.playersNumber + 1,
+            status: session.playersNumber === 5 ? 1 : undefined,
+        });
+
         const updatedUserData = { ...playerResponse.data, sessionId: session.id };
         sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
         router.push('/salon');
