@@ -3,7 +3,7 @@ import Button from '../components/_button';
 
 export default function Rules() {
     return (
-        <div className="box-area flex flex-col items-center bg-black text-white min-h-screen">
+        <div className="box-area flex flex-col items-center text-white min-h-screen">
             <div className="w-full max-w-lg flex flex-col items-center py-20 h-screen overflow-y-auto space-y-12">
                 <h1 className="text-6xl font-Amatic text-yellow-400">Règles du Jeu</h1>
 
