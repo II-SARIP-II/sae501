@@ -51,14 +51,44 @@ export default function Salon() {
         }
     };
 
-    const updateSessionStatus = async () => {
+    const startGame = async () => {
+        const storedPlayer = getStoredUserData()
         try {
             await axios.put('/api/session', {
                 id: session.id,
                 status: 1,
             });
             setGameCreated(true);
-            socket.emit('startGame', session.id); // Informer tous les utilisateurs que la partie démarre
+            console.log("start game" , players, "session", session)
+            const playerNumber = players.length;
+            let roleCount = 0;
+
+            //déterminez combien de joueurs auront le rôle '1' en fonciton du nobre de player
+            if (playerNumber >= 3 && playerNumber <= 4) {
+                roleCount = 1;
+            } else if (playerNumber >= 5 && playerNumber <= 6) {
+                roleCount = 2;
+            }
+
+            //sélectionnez aléatoirement les joueurs avec le rôle '1'
+            const selectedIndices = [];
+            while (selectedIndices.length < roleCount) {
+                const randomIndex = Math.floor(Math.random() * playerNumber);
+                if (!selectedIndices.includes(randomIndex)) {
+                    selectedIndices.push(randomIndex);
+                }
+            }
+
+            //assignez les rôles aux joueurs
+            for (let i = 0; i < playerNumber; i++) {
+                const role = selectedIndices.includes(i) ? 1 : 0;
+                await axios.put("/api/player", {
+                    id: players[i].id,
+                    role: role
+                });
+            }
+            socket.emit('startGame', storedPlayer.sessionId); // Informer tous les utilisateurs que la partie démarre
+
         } catch (error) {
             console.error('Erreur lors de la mise à jour de la session :', error);
         }
@@ -84,14 +114,15 @@ export default function Salon() {
             });
 
             socketConnection.on('updatePlayers', (updatedPlayers) => {
+                setPlayers(null);
                 setPlayers(updatedPlayers);
             });
 
-            socketConnection.on('gameStarted', (sessionId) => {
-                if (session.id === sessionId) {
-                    setGameCreated(true);
-                }
+            socketConnection.on('gameStarted', (redirectUrl) => {
+                console.log('Événement "gameStarted" reçu. Redirection vers :', redirectUrl);  // Ajout de log pour voir si l'événement est bien reçu
+                router.push("/role"); // Rediriger tous les joueurs
             });
+
 
             // Nettoyer la connexion Socket.IO à la fin
             return () => {
@@ -150,7 +181,7 @@ export default function Salon() {
                 sessionId: null,
             });
 
-            const updatedUserData = { ...playerResponse.data, sessionId: null };            //mettre a null la session du joueur en front
+            const updatedUserData = { ...playerResponse, sessionId: null };            //mettre a null la session du joueur en front
             sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
 
             await router.push("/"); //retour à index.js
@@ -202,11 +233,11 @@ export default function Salon() {
                             <p className="text-gray-400">Aucun utilisateur pour le moment...</p>
                         )}
 
-                        {!gameCreated ? (
+                        {session.status === 0 ? (
                             isHost && players.length >= 3 ? (
                                 <Button
                                     label="Créer la partie"
-                                    onClick={updateSessionStatus}
+                                    onClick={startGame}
                                     className="py-3 bg-black text-green-500 border-green-500 mt-12"
                                 />
                             ) : (

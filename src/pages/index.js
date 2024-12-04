@@ -31,7 +31,7 @@ export default function Index() {
     };
 
     // useEffect pour vérifier le mobile et charger les données utilisateur
-    useEffect(() => {
+    useEffect(async () => {
         checkDevice();
         window.addEventListener('resize', checkDevice);
 
@@ -39,7 +39,18 @@ export default function Index() {
         if (playerData) {
             setUserPseudo(playerData.name);
         }
-
+        const storedPlayer = getStoredUserData();
+        if (storedPlayer) {
+            console.log(storedPlayer.id)
+            const playerResponse = await axios.put('/api/player', {
+                id: storedPlayer.id,
+                sessionId: null,
+                role: null
+            });
+            console.log(playerResponse.data)
+            const updatedUserData = {...playerResponse.data};
+            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+        }
         return () => {
             window.removeEventListener('resize', checkDevice);
         };

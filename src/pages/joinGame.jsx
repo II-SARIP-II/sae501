@@ -4,7 +4,6 @@ import Button from '../components/_button';
 import Link from "next/link";
 import TextInput from "../components/_textInput";
 import axios from "axios";
-import {el} from "@faker-js/faker";
 
 export default function JoinGame({ setSessionData, sessionData }) {
     const [sessionCodeInput, setSessionCodeInput] = useState('');
