@@ -47,7 +47,12 @@ export default function Salon() {
             });
             setPlayers(response.data);
         } catch (error) {
-            console.error('Erreur lors de la récupération des joueurs :', error);
+            if (error.response && error.response.status === 404) {
+                console.error('La ressource demandée est introuvable');
+                alert('Aucun joueur trouvé pour cette session.');
+            } else {
+                console.error('Erreur lors de la récupération des joueurs :', error);
+            }
         }
     };
 
