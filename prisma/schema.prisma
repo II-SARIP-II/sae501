@@ -16,7 +16,7 @@ model Players {
   gameData  String?   @db.Text
   Session   Sessions? @relation(fields: [sessionId], references: [id], onUpdate: Restrict, map: "Players_ibfk_1")
 
-  @@index([sessionId], map: "sessionId")
+  @@index([sessionId], map: "Players_ibfk_1")
 }
 
 model Sessions {
