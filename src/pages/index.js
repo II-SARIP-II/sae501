@@ -38,23 +38,6 @@ export default function Index() {
             if (playerData) {
                 setUserPseudo(playerData.name);
             }
-
-            const storedPlayer = getStoredUserData();
-            if (storedPlayer) {
-                console.log(storedPlayer.id);
-                try {
-                    const playerResponse = await axios.put('/api/player', {
-                        id: storedPlayer.id,
-                        sessionId: storedPlayer.sessionId ?? null,  // Utiliser `?? null` pour gérer les valeurs undefined
-                        role: storedPlayer.role ?? null,
-                        score: storedPlayer.score ?? null,
-                        gameData: storedPlayer.gameData ?? null
-                    });
-                    console.log('Données mises à jour', playerResponse.data);
-                } catch (error) {
-                    console.error('Erreur lors de la mise à jour du joueur:', error);
-                }
-            }
         };
 
         fetchPlayerData();
@@ -100,11 +83,10 @@ export default function Index() {
             // MISE À JOUR DU JOUEUR
             const updatedPlayer = await axios.put('/api/player', {
                 id: storedPlayer.id,
-                sessionId: storedPlayer.sessionId,
-                name: storedPlayer.name,
-                role: storedPlayer.role ?? null,
-                score: storedPlayer.score ?? null,
-                gameData: storedPlayer.gameData ?? null
+                sessionId: sessionResponse.data.id,
+                role: null,
+                score: null,
+                gameData: null
             });
 
             console.log('Données mises à jour :', updatedPlayer.data);  // Log des données pour vérifier

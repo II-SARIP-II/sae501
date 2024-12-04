@@ -43,7 +43,7 @@ export default function Salon() {
     const fetchPlayersBySessionId = async (sessionId) => {
         try {
             const response = await axios.get('/api/player', {
-                params: { sessionId },
+                params: { sessionId: sessionId },
             });
             setPlayers(response.data);
         } catch (error) {
@@ -186,7 +186,7 @@ export default function Salon() {
                 sessionId: null,
             });
 
-            const updatedUserData = { ...playerResponse, sessionId: null };            //mettre a null la session du joueur en front
+            const updatedUserData = { ...playerResponse.data, sessionId: null };            //mettre a null la session du joueur en front
             sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
 
             await router.push("/"); //retour à index.js
