@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react';
 import axios from "axios";
+import {pl} from "@faker-js/faker";
 
 export default function Role() {
     const [role, setRole] = useState(null);
@@ -19,11 +20,13 @@ export default function Role() {
         try {
             console.log(storedPlayer.id)
 
-            const response = await axios.get('/api/player', {
+            const playerResponse = await axios.get('/api/player', {
                 params:{id: storedPlayer.id}
             });
-            console.log(response)
-            setRole(response.data.role);
+            console.log(playerResponse.data)
+            const updatedUserData = { ...playerResponse.data, role: playerResponse.data.role };            //mettre a null la session du joueur en front
+            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+            setRole(playerResponse.data.role);
         } catch (error) {
             console.error('Erreur lors de la récupération des joueurs :', error);
         }

@@ -32,7 +32,7 @@ export default function handler(req, res) {
 
             socket.on('startGame', (sessionId) => {
                 console.log(`La partie dans la session ${sessionId} commence.`);
-                io.to(sessionId).emit('gameStarted', sessionId);
+                io.to(sessionId).emit('gameStarted', '/role');
             });
 
             socket.on('joinSession', (sessionId, player) => {

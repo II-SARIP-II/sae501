@@ -52,6 +52,7 @@ export default function Salon() {
     };
 
     const startGame = async () => {
+        const storedPlayer = getStoredUserData()
         try {
             await axios.put('/api/session', {
                 id: session.id,
@@ -86,8 +87,7 @@ export default function Salon() {
                     role: role
                 });
             }
-
-            //socket.emit('startGame', session.id); // Informer tous les utilisateurs que la partie démarre
+            socket.emit('startGame', storedPlayer.sessionId); // Informer tous les utilisateurs que la partie démarre
 
         } catch (error) {
             console.error('Erreur lors de la mise à jour de la session :', error);
@@ -114,14 +114,15 @@ export default function Salon() {
             });
 
             socketConnection.on('updatePlayers', (updatedPlayers) => {
+                setPlayers(null);
                 setPlayers(updatedPlayers);
             });
 
-            socketConnection.on('gameStarted', (sessionId) => {
-                if (session.id === sessionId) {
-                    setGameCreated(true);
-                }
+            socketConnection.on('gameStarted', (redirectUrl) => {
+                console.log('Événement "gameStarted" reçu. Redirection vers :', redirectUrl);  // Ajout de log pour voir si l'événement est bien reçu
+                router.push("/role"); // Rediriger tous les joueurs
             });
+
 
             // Nettoyer la connexion Socket.IO à la fin
             return () => {
@@ -179,7 +180,7 @@ export default function Salon() {
                 sessionId: null,
             });
 
-            const updatedUserData = { ...playerResponse.data, sessionId: null };            //mettre a null la session du joueur en front
+            const updatedUserData = { ...playerResponse, sessionId: null };            //mettre a null la session du joueur en front
             sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
 
             await router.push("/"); //retour à index.js
@@ -231,7 +232,7 @@ export default function Salon() {
                             <p className="text-gray-400">Aucun utilisateur pour le moment...</p>
                         )}
 
-                        {!gameCreated ? (
+                        {session.status === 0 ? (
                             isHost && players.length >= 3 ? (
                                 <Button
                                     label="Créer la partie"
