@@ -1,3 +1,4 @@
+// src/pages/index.js
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -12,12 +13,10 @@ export default function Index() {
     const [userPseudo, setUserPseudo] = useState('');
     const router = useRouter();
 
-    // Fonction utilitaire pour vérifier l'appareil
     const checkDevice = () => {
         setIsMobileDevice(window.innerWidth <= 768);
     };
 
-    // Fonction utilitaire pour récupérer les données utilisateur
     const getStoredUserData = () => {
         try {
             const storedPlayer = sessionStorage.getItem('userData');
@@ -30,51 +29,53 @@ export default function Index() {
         return null;
     };
 
-    // useEffect pour vérifier le mobile et charger les données utilisateur
-    useEffect(async () => {
+    useEffect(() => {
         checkDevice();
         window.addEventListener('resize', checkDevice);
 
-        const playerData = getStoredUserData();
-        if (playerData) {
-            setUserPseudo(playerData.name);
-        }
-        const storedPlayer = getStoredUserData();
-        if (storedPlayer) {
-            console.log(storedPlayer.id)
-            const playerResponse = await axios.put('/api/player', {
-                id: storedPlayer.id,
-                sessionId: null,
-                role: null
-            });
-            console.log(playerResponse.data)
-            const updatedUserData = {...playerResponse.data};
-            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
-        }
+        const fetchPlayerData = async () => {
+            const playerData = getStoredUserData();
+            if (playerData) {
+                setUserPseudo(playerData.name);
+            }
+
+            const storedPlayer = getStoredUserData();
+            if (storedPlayer) {
+                console.log(storedPlayer.id);
+                try {
+                    const playerResponse = await axios.put('/api/player', {
+                        id: storedPlayer.id,
+                        sessionId: storedPlayer.sessionId ?? null,  // Utiliser `?? null` pour gérer les valeurs undefined
+                        role: storedPlayer.role ?? null,
+                        score: storedPlayer.score ?? null,
+                        gameData: storedPlayer.gameData ?? null
+                    });
+                    console.log('Données mises à jour', playerResponse.data);
+                } catch (error) {
+                    console.error('Erreur lors de la mise à jour du joueur:', error);
+                }
+            }
+        };
+
+        fetchPlayerData();
+
         return () => {
             window.removeEventListener('resize', checkDevice);
         };
     }, []);
 
-    // Générer un code unique
     const generateCode = () => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let code = '';
-
-        // Ajouter une partie aléatoire du code
-        for (let i = 0; i < 6; i++) { // 6 caractères aléatoires
+        for (let i = 0; i < 6; i++) {
             code += characters.charAt(Math.floor(Math.random() * characters.length));
         }
-
-        // Ajouter une partie de l'horodatage pour garantir l'unicité
-        const timestamp = Date.now().toString(36); // Convertir le timestamp en base 36
-        code += timestamp.slice(-4); // Utiliser seulement les 4 derniers caractères du timestamp
-
+        const timestamp = Date.now().toString(36);
+        code += timestamp.slice(-4);
         return code;
     };
 
-
-    // Créer une session + update Player -> SessionId + mise a jour du session storage
+    // Création de la session + update Player -> SessionId + mise à jour du session storage
     const createGame = async () => {
         const storedPlayer = getStoredUserData();
 
@@ -93,14 +94,23 @@ export default function Index() {
                 hostId: storedPlayer.id
             });
 
+            // Vérification des données reçues
+            console.log('Session créée:', sessionResponse.data);
+
             // MISE À JOUR DU JOUEUR
-            const playerResponse = await axios.put('/api/player', {
+            const updatedPlayer = await axios.put('/api/player', {
                 id: storedPlayer.id,
-                sessionId: sessionResponse.data.id,
+                sessionId: storedPlayer.sessionId,
+                name: storedPlayer.name,
+                role: storedPlayer.role ?? null,
+                score: storedPlayer.score ?? null,
+                gameData: storedPlayer.gameData ?? null
             });
 
+            console.log('Données mises à jour :', updatedPlayer.data);  // Log des données pour vérifier
+
             // Mise à jour du sessionStorage
-            const updatedUserData = { ...playerResponse.data, sessionId: sessionResponse.data.id };
+            const updatedUserData = { ...updatedPlayer.data, sessionId: sessionResponse.data.id };
             sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
             router.push('/salon');
 
@@ -122,7 +132,6 @@ export default function Index() {
                 <div className="box-area flex flex-col items-center justify-center">
                     <h1 className="text-6xl font-Amatic text-white mb-24">Parmi Nous</h1>
 
-                    {/* Affichage du pseudo si disponible */}
                     {userPseudo && (
                         <p className="text-2xl text-yellow-400 font-Amatic mb-8">
                             Bienvenue, <span className="font-bold">{userPseudo}</span> !

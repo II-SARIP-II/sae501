@@ -34,17 +34,20 @@ export default async function handler(req, res) {
             }
 
         } else if (req.method === 'POST') {
-            const { name } = req.body; // On récupère seulement le pseudo
+            const { name } = req.body;
             if (!name || name.trim() === '') {
                 return res.status(400).json({ message: 'Le pseudo est obligatoire.' });
             }
             const player = await prisma.players.create({
-                data: { name }, // On enregistre uniquement le pseudo
+                data: { name },
             });
             res.status(201).json(player);
 
         } else if (req.method === 'PUT') {
             const { id, sessionId, name, role, score, gameData } = req.body;
+
+            // Log des données reçues
+            console.log('Données PUT reçues:', { id, sessionId, name, role, score, gameData });
 
             const existingPlayer = await prisma.players.findUnique({
                 where: { id },
@@ -54,20 +57,24 @@ export default async function handler(req, res) {
                 return res.status(404).json({ message: 'Player not found' });
             }
 
-            const updatedPlayer = await prisma.players.update({
-                where: { id },
-                data: {
-                    sessionId,
-                    name,
-                    role,
-                    score,
-                    gameData
-                },
-            });
+            try {
+                const updatedPlayer = await prisma.players.update({
+                    where: { id },
+                    data: {
+                        sessionId: sessionId ?? undefined,
+                        name: name ?? undefined,
+                        role: role ?? undefined,
+                        score: score ?? undefined,
+                        gameData: gameData ?? undefined,
+                    },
+                });
+                res.status(200).json(updatedPlayer);
+            } catch (error) {
+                console.error('Erreur lors de la mise à jour du joueur:', error);
+                res.status(500).json({ message: 'Erreur lors de la mise à jour du joueur' });
+            }
 
-            res.status(200).json(updatedPlayer);
-
-      } else if (req.method === 'DELETE') {
+        } else if (req.method === 'DELETE') {
             const { id } = req.query;
 
             const existingPlayer = await prisma.players.findUnique({
@@ -81,7 +88,6 @@ export default async function handler(req, res) {
             await prisma.players.delete({
                 where: { id: parseInt(id) },
             });
-
 
             res.status(200).json({ message: 'Player deleted successfully' });
         } else {
