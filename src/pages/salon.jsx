@@ -137,6 +137,7 @@ export default function Salon() {
              } else {                   //host + si il y a pas d'autre joueur
 
                 // Supprimer la session s'il n'y a plus de joueurs
+                console.log('ID de la session à supprimer :', session.id);
                 const sessionResponse = await axios.delete('/api/session', {
                     params: { id: session.id },
                 });

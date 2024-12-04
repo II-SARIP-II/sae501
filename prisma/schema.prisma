@@ -14,9 +14,9 @@ model Players {
   role      Int?
   score     Int?
   gameData  String?   @db.Text
-  Session   Sessions? @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Players_ibfk_1")
+  Session   Sessions? @relation(fields: [sessionId], references: [id], onUpdate: Restrict, map: "Players_ibfk_1")
 
-  @@index([sessionId], map: "sessionId")
+  @@index([sessionId], map: "Players_ibfk_1")
 }
 
 model Sessions {
