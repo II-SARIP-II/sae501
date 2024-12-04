@@ -43,7 +43,7 @@ export default function Salon() {
     const fetchPlayersBySessionId = async (sessionId) => {
         try {
             const response = await axios.get('/api/player', {
-                params: { sessionId },
+                params: { sessionId: sessionId },
             });
             setPlayers(response.data);
         } catch (error) {
