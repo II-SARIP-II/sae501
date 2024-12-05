@@ -39,14 +39,12 @@ model Suspects {
   id          Int        @id @default(autoincrement())
   name        String?    @db.VarChar(25)
   description String?    @db.Text
-  hints       String?    @default("{}") @db.LongText
   KilledIn    Sessions[] @relation("SessionKiller")
 }
 
 model Suspect_hints {
   id        Int    @id @default(autoincrement())
   suspectId Int
-  hintId    Int
   hintText  String @db.Text
 
   @@index([suspectId], map: "Suspect_hints_ibfk_1")
