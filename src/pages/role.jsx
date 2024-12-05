@@ -1,11 +1,12 @@
-import {useState, useEffect} from 'react';
-import axios from "axios";
-import {pl} from "@faker-js/faker";
-import {router} from "next/client";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/router';
 
 export default function Role() {
     const [isVisible, setIsVisible] = useState(false);
     const [role, setRole] = useState(null);
+    const router = useRouter();
+
     const getStoredUserData = () => {
         try {
             const storedPlayer = sessionStorage.getItem('userData');
@@ -17,22 +18,31 @@ export default function Role() {
         }
         return null;
     };
-    useEffect(async () => {
-        const storedPlayer = getStoredUserData();
-        try {
-            console.log(storedPlayer.id)
 
-            const playerResponse = await axios.get('/api/player', {
-                params:{id: storedPlayer.id}
-            });
-            console.log(playerResponse.data)
-            const updatedUserData = { ...playerResponse.data, role: playerResponse.data.role };            //mettre a null la session du joueur en front
-            sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
-            setRole(playerResponse.data.role);
-        } catch (error) {
-            console.error('Erreur lors de la récupération des joueurs :', error);
+    useEffect(() => {
+        async function fetchPlayerRole() {
+            const storedPlayer = getStoredUserData();
+            if (!storedPlayer) return; // Si aucune donnée n'est stockée, on sort de la fonction.
+            try {
+                console.log(storedPlayer.id);
+
+                const playerResponse = await axios.get('/api/player', {
+                    params: { id: storedPlayer.id },
+                });
+                console.log(playerResponse.data);
+                const updatedUserData = {
+                    ...playerResponse.data,
+                    role: playerResponse.data.role,
+                };
+                // Mettre à jour la session du joueur
+                sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+                setRole(playerResponse.data.role);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des joueurs :', error);
+            }
         }
 
+        fetchPlayerRole(); // Appel de la fonction
     }, []);
 
     useEffect(() => {
@@ -40,10 +50,13 @@ export default function Role() {
         return () => clearTimeout(timer); // Nettoie le timer si le composant est démonté.
     }, []);
 
-    useEffect(()=>{
-        const timerRouterPush = setTimeout(()=> router.push('/enigma'), 10000);
+    useEffect(() => {
+        const timerRouterPush = setTimeout(() => {
+            router.push('/enigma');
+        }, 10000);
+
         return () => clearTimeout(timerRouterPush); // Nettoie le timer si le composant est démonté.
-    })
+    }, []);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -51,7 +64,7 @@ export default function Role() {
             {role === 0 ? (
                 <h1
                     className={`font-Amatic text-4xl font-bold text-green-500 transition-opacity duration-[5000ms] ${
-                        isVisible ? "opacity-100" : "opacity-0"
+                        isVisible ? 'opacity-100' : 'opacity-0'
                     }`}
                 >
                     ENQUÊTEUR
@@ -59,7 +72,7 @@ export default function Role() {
             ) : role === 1 ? (
                 <h1
                     className={`font-Amatic text-4xl font-bold text-red-500 transition-opacity duration-[5000ms] ${
-                        isVisible ? "opacity-100" : "opacity-0"
+                        isVisible ? 'opacity-100' : 'opacity-0'
                     }`}
                 >
                     SABOTEUR
@@ -67,7 +80,7 @@ export default function Role() {
             ) : (
                 <h1
                     className={`font-Amatic text-4xl font-bold text-gray-500 transition-opacity duration-[5000ms] ${
-                        isVisible ? "opacity-100" : "opacity-0"
+                        isVisible ? 'opacity-100' : 'opacity-0'
                     }`}
                 >
                     Problème de rôle

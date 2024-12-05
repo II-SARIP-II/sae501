@@ -13,7 +13,7 @@ export default function handler(req, res) {
             }
         }
 
-        return res.status(200).json(questions); // Retourne toutes les questions si aucun ID n'est donné
+        return res.status(200).json(questions);
     }
 
     res.setHeader('Allow', ['GET']);

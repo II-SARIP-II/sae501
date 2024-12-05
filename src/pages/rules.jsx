@@ -3,7 +3,7 @@ import Button from '../components/_button';
 
 export default function Rules() {
     return (
-        <div className="box-area flex flex-col items-center text-white min-h-screen">
+        <div className="box-area relative min-h-screen flex justify-center text-white">
             <div className="w-full max-w-lg flex flex-col items-center py-20 h-screen overflow-y-auto space-y-12">
                 <h1 className="text-6xl font-Amatic text-yellow-400">Règles du Jeu</h1>
 
@@ -24,12 +24,6 @@ export default function Rules() {
                         </li>
                         <li>
                             <strong className="text-yellow-300">Saboteurs :</strong> Détournez l'attention pour induire l'équipe en erreur.
-                        </li>
-                        <li>
-                            <strong className="text-red-500">Imposteur :</strong> Un des saboteurs est le tueur. Il appartient à cette liste&nbsp;:
-                            <span className="block mt-2 italic text-white">
-                                Hitler, Staline, Mussolini, Kim Jong-il, Pétain.
-                            </span>
                         </li>
                     </ul>
                 </div>
