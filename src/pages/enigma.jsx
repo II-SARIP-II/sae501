@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import Button from '../components/_button';
-
+import { useState, useEffect } from 'react';
+import RoleSlide from "../components/_roleSlide";
+import Button from "../components/_button";
 export default function Game() {
+
     const [question, setQuestion] = useState(null);
     const [questionNumber, setQuestionNumber] = useState(1);
     const [answer, setAnswer] = useState('');
@@ -52,7 +53,10 @@ export default function Game() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center text-white p-8">
+
+        <div className="min-h-screen flex flex-col items-center justify-center text-white ">
+            <RoleSlide />
+
             <div className="w-full max-w-lg flex flex-col items-center py-20 space-y-12">
                 <h1 className="text-6xl font-Amatic text-yellow-400 mb-12">
                     Énigme #{questionNumber}
