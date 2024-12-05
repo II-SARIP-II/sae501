@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../components/_button';
-import Link from 'next/link';
 import axios from 'axios';
 import io from 'socket.io-client';
-import {emit} from "next/dist/client/components/react-dev-overlay/pages/bus";
 import {router} from "next/client";
 
 export default function Salon() {
@@ -26,7 +24,6 @@ export default function Salon() {
         return null;
     };
 
-    // Charger les données de session
     const fetchSessionBySessionId = async (sessionId) => {
         try {
             const response = await axios.get('/api/session', {
@@ -129,10 +126,7 @@ export default function Salon() {
             });
 
 
-            // Nettoyer la connexion Socket.IO à la fin
-            return () => {
-                socketConnection.disconnect();
-            };
+
         }
     }, []);
 
