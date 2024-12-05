@@ -34,12 +34,21 @@ model Sessions {
 }
 
 model Suspects {
-  id          Int       @id @default(autoincrement())
-  sessionId   Int?
-  name        String?   @db.VarChar(25)
-  description String?   @db.Text
-  hints       String?   @default("{}") @db.LongText
-  Session     Sessions? @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Suspects_ibfk_1")
+  id            Int             @id @default(autoincrement())
+  name          String?         @db.VarChar(25)
+  description   String?         @db.Text
+  hints         String?         @default("{}") @db.LongText
+  Suspect_hints Suspect_hints[]
+  Session       Sessions?       @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Suspects_ibfk_1")
+}
 
-  @@index([sessionId], map: "sessionId")
+model Suspect_hints {
+  id        Int      @id @default(autoincrement())
+  suspectId Int
+  hintId    Int
+  hintText  String   @db.Text
+  Suspects  Suspects @relation(fields: [suspectId], references: [id], onDelete: Cascade)
+
+  @@index([suspectId], map: "suspectId")
+  @@index([hintId], map: "hintId")
 }
