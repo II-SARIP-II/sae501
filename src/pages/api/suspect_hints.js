@@ -6,22 +6,22 @@ const prisma = new PrismaClient();
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         // -----------------------------------------------------RÉCUPÈRE LES INDICES---------------------------------------------------------//
-        const { suspectId, hintId } = req.query;
+        const { suspectId, id } = req.query;
 
         try {
-            if (suspectId && !hintId) {
+            if (suspectId && !id) {
                 // Récupère tous les indices pour un suspect donné
                 const suspectHints = await prisma.suspect_hints.findMany({
                     where: { suspectId: parseInt(suspectId) },
-                    include: { Suspects: true },
+                    //include: { Suspects: true },
                 });
                 res.status(200).json(suspectHints);
-            } else if (suspectId && hintId) {
+            } else if (suspectId && id) {
                 // Récupère un indice spécifique pour un suspect donné
                 const suspectHint = await prisma.suspect_hints.findFirst({
                     where: {
                         suspectId: parseInt(suspectId),
-                        hintId: parseInt(hintId),
+                        id: parseInt(id),
                     },
                     include: { Suspects: true },
                 });

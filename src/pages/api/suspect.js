@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
-        // -----------------------------------------------------RÉCUPERE SUSPECT PAR SESSION ID---------------------------------------------------------//
-        const { sessionId } = req.query;
-        const suspects = await prisma.suspects.findMany({
-            where: { sessionId: parseInt(sessionId) },
+        // -----------------------------------------------------RÉCUPERE SUSPECT PAR suspect ID---------------------------------------------------------//
+        const { id } = req.query;
+        const suspects = await prisma.suspects.findUnique({
+            where: { id: parseInt(id) },
         });
         res.status(200).json(suspects);
 
