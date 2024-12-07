@@ -1,65 +1,73 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import io from 'socket.io-client';
 import RoleSlide from "../components/_roleSlide";
 import Button from "../components/_button";
-export default function Game() {
 
+export default function Game() {
     const [question, setQuestion] = useState(null);
-    const [questionNumber, setQuestionNumber] = useState(1);
     const [answer, setAnswer] = useState('');
     const [feedback, setFeedback] = useState('');
-    const [isAnswered, setIsAnswered] = useState(false);
+    const [socket, setSocket] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
-        const fetchRandomQuestion = async () => {
-            const response = await fetch('/api/question/enigma');
-            const questions = await response.json();
-            const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
-            setQuestion(randomQuestion);
-            setQuestionNumber(questions.indexOf(randomQuestion) + 1); // Met à jour le numéro de l'énigme
-        };
+        const socketInstance = io({
+            path: '/api/socket',
+        });
 
-        fetchRandomQuestion();
-    }, []);
+        setSocket(socketInstance);
+
+        socketInstance.emit('joinSession', 'sessionId', { name: 'Player 1' });
+        socketInstance.emit('launchQuestions', 'sessionId');
+
+        socketInstance.on('nextQuestion', (newQuestion) => {
+            console.log('Question reçue :', newQuestion);
+            setQuestion(newQuestion);
+            setAnswer('');
+            setFeedback('');
+        });
+
+        socketInstance.on('answerSubmitted', ({ correct, feedback }) => {
+            console.log('Feedback de la réponse:', feedback);
+            if (correct !== undefined) {
+                router.push('/result');
+            }
+        });
+
+        return () => {
+            socketInstance.off('nextQuestion');
+            socketInstance.off('answerSubmitted');
+            socketInstance.disconnect();
+        };
+    }, [router]);
+
 
     const handleAnswerChange = (e) => {
         setAnswer(e.target.value);
-        setIsAnswered(e.target.value !== '');
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();  // Empêche la soumission par défaut du formulaire
+    const handleSubmit = (e) => {
+        e.preventDefault();
 
         if (answer === '') {
             console.log('Aucune réponse donnée');
-            return;  // Si pas de réponse, on ne fait rien
+            return;
         }
 
-        console.log('Réponse envoyée:', answer);  // Affiche la réponse envoyée
+        console.log('Réponse envoyée:', answer);
 
-        const response = await fetch('/api/question/answer', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({id: question.id, answer}),
-        });
+        socket.emit('submitAnswer', { sessionId: 'yourSessionId', questionId: question.id, answer });
 
-        const result = await response.json();
-        console.log('Réponse de l\'API:', result);  // Affiche la réponse de l'API
-
-        if (result.correct) {
-            setFeedback('Bonne réponse !');
-        } else {
-            setFeedback('Mauvaise réponse, essayez encore.');
-        }
     };
 
     return (
-
-        <div className="min-h-screen flex flex-col items-center justify-center text-white ">
+        <div className="min-h-screen flex flex-col items-center justify-center text-white">
             <RoleSlide />
 
             <div className="w-full max-w-lg flex flex-col items-center py-20 space-y-12">
                 <h1 className="text-6xl font-Amatic text-yellow-400 mb-12">
-                    Énigme #{questionNumber}
+                    Énigme
                 </h1>
                 {question ? (
                     <div className="w-full max-w-md text-center">
@@ -80,11 +88,6 @@ export default function Game() {
                                 disabled={!answer}
                             />
                         </form>
-                        {feedback && (
-                            <p className={`mt-4 text-xl ${feedback === 'Bonne réponse !' ? 'text-green-500' : 'text-red-500'}`}>
-                                {feedback} {/* Affiche si la réponse est correcte ou incorrecte */}
-                            </p>
-                        )}
                     </div>
                 ) : (
                     <p className="text-xl text-gray-400">Chargement...</p>
