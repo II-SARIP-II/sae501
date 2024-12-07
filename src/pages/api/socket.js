@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import questions from '../../data/questions.json';
 
 const sessions = {}; // Stock temporaire pour les sessions et leurs joueurs
 
@@ -16,32 +17,62 @@ export default function handler(req, res) {
         io.on('connection', (socket) => {
             console.log('Nouvelle connexion établie :', socket.id);
 
+
+            // Rejoindre une session
             socket.on('joinSession', (sessionId, player) => {
                 console.log(`${player.name} a rejoint la session ${sessionId}`);
 
-                // Ajout du joueur dans la session
-                if (!sessions[sessionId]) sessions[sessionId] = [];
-                sessions[sessionId].push(player);
+                // Initialiser la session si elle n'existe pas
+                if (!sessions[sessionId]) sessions[sessionId] = { players: [], questions: [], answered: false };
 
-                // Rejoindre la "room"
+                sessions[sessionId].players.push(player);
                 socket.join(sessionId);
 
-                // Émettre la mise à jour
-                io.to(sessionId).emit('updatePlayers', sessions[sessionId]);
+                io.to(sessionId).emit('updatePlayers', sessions[sessionId].players);
             });
 
+
+            // Démarrer une partie
             socket.on('startGame', (sessionId) => {
                 console.log(`La partie dans la session ${sessionId} commence.`);
                 io.to(sessionId).emit('gameStarted', '/role');
             });
 
-            socket.on('joinSession', (sessionId, player) => {
-                console.log(`Reçu : joinSession - sessionId: ${sessionId}, player: ${JSON.stringify(player)}`);
+
+            // Lancer les questions
+            socket.on('launchQuestions', (sessionId) => {
+                console.log(`Lancement des questions pour la session : ${sessionId}`);
+                if (sessions[sessionId]) {
+                    if (sessions[sessionId].questions.length === 0) {
+                        sessions[sessionId].questions = [...questions];
+                    }
+                    const firstQuestion = sessions[sessionId].questions.shift();
+                    if (firstQuestion) {
+                        sessions[sessionId].answered = false;
+                        io.to(sessionId).emit('nextQuestion', firstQuestion);
+                    }
+                }
             });
 
-            socket.on('disconnect', () => {
-                console.log('Utilisateur déconnecté :', socket.id);
+
+            socket.on('submitAnswer', ({ questionId, answer }) => {
+                const question = questions.find(q => q.id === questionId);
+                if (!question) {
+                    socket.emit('answerFeedback', { correct: false, feedback: "Question introuvable" });
+                    return;
+                }
+                const isCorrect = Array.isArray(question.answer)
+                    ? question.answer.some(correctAnswer => correctAnswer.toLowerCase() === answer.toLowerCase())
+                    : question.answer.toLowerCase() === answer.toLowerCase();
+                const feedback = isCorrect ? "Bonne réponse !" : "Mauvaise réponse.";
+                const session = Object.values(sessions).find(session => session.questions.some(q => q.id === questionId));
+                if (session?.answered) {
+                    return;
+                }
+                if (session) session.answered = true;
+                io.to(socket.handshake.query.sessionId).emit('answerSubmitted', { correct: isCorrect, feedback });
             });
+
         });
 
         res.socket.server.io = io;
