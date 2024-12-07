@@ -42,59 +42,35 @@ export default function handler(req, res) {
             // Lancer les questions
             socket.on('launchQuestions', (sessionId) => {
                 console.log(`Lancement des questions pour la session : ${sessionId}`);
-
                 if (sessions[sessionId]) {
-                    // Charger les questions si elles ne sont pas encore chargées
                     if (sessions[sessionId].questions.length === 0) {
-                        console.log('Chargement des questions...');
                         sessions[sessionId].questions = [...questions];
                     }
-
-                    console.log(`Questions restantes : ${sessions[sessionId].questions.length}`);
                     const firstQuestion = sessions[sessionId].questions.shift();
-
                     if (firstQuestion) {
-                        sessions[sessionId].answered = false; // Réinitialiser l'état de réponse
+                        sessions[sessionId].answered = false;
                         io.to(sessionId).emit('nextQuestion', firstQuestion);
-                    } else {
-                        console.log('Aucune question disponible.');
                     }
-                } else {
-                    console.log(`La session ${sessionId} n'existe pas.`);
                 }
             });
 
 
-            socket.on('submitAnswer', ({ sessionId, questionId, answer }) => {
-                console.log(`Réponse reçue : questionId=${questionId}, answer=${answer}`);
-
+            socket.on('submitAnswer', ({ questionId, answer }) => {
                 const question = questions.find(q => q.id === questionId);
                 if (!question) {
-                    console.log(`Question avec l'ID ${questionId} introuvable`);
                     socket.emit('answerFeedback', { correct: false, feedback: "Question introuvable" });
                     return;
                 }
-
                 const isCorrect = Array.isArray(question.answer)
                     ? question.answer.some(correctAnswer => correctAnswer.toLowerCase() === answer.toLowerCase())
                     : question.answer.toLowerCase() === answer.toLowerCase();
-
                 const feedback = isCorrect ? "Bonne réponse !" : "Mauvaise réponse.";
-
-                console.log(`Feedback : ${feedback}`);
-
                 const session = Object.values(sessions).find(session => session.questions.some(q => q.id === questionId));
                 if (session?.answered) {
-                    console.log('Réponse déjà donnée pour cette question.');
                     return;
                 }
-
                 if (session) session.answered = true;
-
-                io.to(sessionId).emit('answerSubmitted', {
-                    correct: isCorrect,
-                    feedback,
-                });
+                io.to(socket.handshake.query.sessionId).emit('answerSubmitted', { correct: isCorrect, feedback });
             });
 
         });

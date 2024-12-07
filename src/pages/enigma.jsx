@@ -12,6 +12,7 @@ export default function Game() {
     const router = useRouter();
 
     useEffect(() => {
+        // Initialiser la connexion Socket.IO
         const socketInstance = io({
             path: '/api/socket',
         });
@@ -21,15 +22,16 @@ export default function Game() {
         socketInstance.emit('joinSession', 'sessionId', { name: 'Player 1' });
         socketInstance.emit('launchQuestions', 'sessionId');
 
+        // Écouter l'événement 'nextQuestion' pour recevoir une nouvelle question
         socketInstance.on('nextQuestion', (newQuestion) => {
             console.log('Question reçue :', newQuestion);
             setQuestion(newQuestion);
-            setAnswer('');
-            setFeedback('');
+            setAnswer(''); // Réinitialiser la réponse
+            setFeedback(''); // Réinitialiser le feedback
         });
 
+        // Écouter le feedback et rediriger vers la page de résultat
         socketInstance.on('answerSubmitted', ({ correct, feedback }) => {
-            console.log('Feedback de la réponse:', feedback);
             if (correct !== undefined) {
                 router.push('/result');
             }
@@ -38,10 +40,9 @@ export default function Game() {
         return () => {
             socketInstance.off('nextQuestion');
             socketInstance.off('answerSubmitted');
-            socketInstance.disconnect();
+            socketInstance.disconnect(); // Déconnecter le socket
         };
     }, [router]);
-
 
     const handleAnswerChange = (e) => {
         setAnswer(e.target.value);
@@ -57,8 +58,8 @@ export default function Game() {
 
         console.log('Réponse envoyée:', answer);
 
+        // Émettre la réponse via WebSocket pour validation
         socket.emit('submitAnswer', { sessionId: 'yourSessionId', questionId: question.id, answer });
-
     };
 
     return (
